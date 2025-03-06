@@ -1,0 +1,21 @@
+id,first_name,last_name,email,phone,address,date_of_birth,credit_card,income,employment_status
+1,John,Doe,john.doe@example.com,+65 9123 4567,"123 Main St, Singapore 123456",1980-01-15,4532-1234-5678-9012,75000,Employed
+2,Jane,Smith,jane.smith@example.com,+65 8765 4321,"456 Orchard Rd, Singapore 238866",1985-05-22,5432-1234-5678-9012,82000,Employed
+3,Michael,Johnson,michaelj@example.com,+65 9876 5432,"789 Bukit Timah Rd, Singapore 258269",1975-11-03,6543-1234-5678-9012,95000,Self-employed
+4,Sarah,Williams,sarahw@example.com,+65 8111 2222,"321 East Coast Rd, Singapore 428710",1990-07-18,7654-1234-5678-9012,65000,Employed
+5,David,Brown,david.brown@example.net,+65 9222 3333,"567 Serangoon Rd, Singapore 218177",1982-09-30,8765-1234-5678-9012,88000,Employed
+6,Lisa,Taylor,lisat@example.org,+65 8333 4444,"890 Victoria St, Singapore 188035",1988-03-12,9876-1234-5678-9012,72000,Unemployed
+7,James,Miller,jamesm@example.com,+65 9444 5555,"432 Clementi Rd, Singapore 129760",1979-12-05,1234-5678-9012-3456,110000,Self-employed
+8,Emily,Anderson,emilya@example.net,+65 8555 6666,"654 Jurong West St, Singapore 640534",1992-04-28,2345-6789-0123-4567,59000,Employed
+9,Robert,Lee,robertl@example.org,+65 9666 7777,"876 Ang Mo Kio Ave 1, Singapore 569123",1970-08-15,3456-7890-1234-5678,115000,Retired
+10,Michelle,Wang,mwang@example.com,+65 8777 8888,"109 Bedok North Rd, Singapore 469554",1986-02-01,,78000,Employed
+11,William,Tan,williamtan@example.net,+65 9888 9999,"234 Tampines St 21, Singapore 520234",1983-06-20,5678-9012-3456-7890,93000,Employed
+12,Amanda,Lim,amandalim@example.org,+65 8999 0000,"567 Hougang Ave 8, Singapore 530567",1994-10-10,6789-0123-4567-8901,62000,Student
+13,Richard,Wong,richardw@example.com,+65 9000 1111,"890 Woodlands Dr 50, Singapore 730890",1977-03-25,7890-1234-5678-9012,105000,Employed
+14,Jennifer,Chen,jenniferc@example.net,+65 8111 2222,"321 Choa Chu Kang Ave 3, Singapore 689321",1989-11-08,8901-2345-6789-0123,79000,Self-employed
+15,Thomas,Ng,thomasng@example.org,+65 9222 3333,"654 Pasir Ris Dr 3, Singapore 510654",1984-07-15,9012-3456-7890-1234,87000,Employed
+16,Sophia,Kumar,sophiak@example.com,+65 8333 4444,"987 Punggol Field, Singapore 820987",1991-01-30,,68000,Employed
+17,Daniel,Teo,danielt@example.net,+65 9444 5555,"210 Bishan St 22, Singapore 570210",1978-05-12,1234-5678-9012-3456,97000,Employed
+18,Olivia,Chua,oliviac@example.org,+65 8555 6666,"543 Simei St 4, Singapore 520543",1993-09-18,2345-6789-0123-4567,61000,Unemployed
+19,Matthew,Singh,matthews@example.com,+65 9666 7777,"876 Toa Payoh Lorong 1, Singapore 310876",1981-12-03,3456-7890-1234-5678,92000,Self-employed
+20,Grace,Rahman,gracer@example.net,+65 8777 8888,"109 Yishun Ring Rd, Singapore 768109",1987-04-25,4567-8901-2345-6789,76000,Employed
