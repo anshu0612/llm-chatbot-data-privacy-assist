@@ -16,7 +16,7 @@ def create_navbar():
                                     [
                                         html.Img(
                                             src="/assets/logo.png",
-                                            height=36,
+                                            height=50,
                                             className="me-2 navbar-logo"
                                         ),
                                     ],

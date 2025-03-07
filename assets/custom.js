@@ -2,6 +2,58 @@
 
 // Add modern interactive animations
 document.addEventListener('DOMContentLoaded', function() {
+    // Add direct click handler for suggested questions for better responsiveness
+    function setupSuggestedQuestions() {
+        const suggestedQuestions = document.querySelectorAll('.suggested-question');
+        suggestedQuestions.forEach(question => {
+            question.addEventListener('click', function() {
+                // Get the text content (skipping the icon)
+                const questionText = this.innerText.trim();
+                
+                // Find the input field and set its value
+                const inputField = document.getElementById('user-input');
+                if (inputField) {
+                    inputField.value = questionText;
+                    inputField.focus();
+                }
+            });
+        });
+    }
+    
+    // Run setup immediately and also when content changes
+    setupSuggestedQuestions();
+    
+    // Set up a mutation observer to detect when new suggested questions are added
+    const observer = new MutationObserver(function(mutations) {
+        // Check if any mutations involve suggested questions
+        let shouldSetup = false;
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length) {
+                for (let i = 0; i < mutation.addedNodes.length; i++) {
+                    const node = mutation.addedNodes[i];
+                    if (node.classList && node.classList.contains('suggested-question')) {
+                        shouldSetup = true;
+                        break;
+                    }
+                    if (node.querySelectorAll) {
+                        const hasQuestions = node.querySelectorAll('.suggested-question').length > 0;
+                        if (hasQuestions) {
+                            shouldSetup = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+        
+        if (shouldSetup) {
+            setupSuggestedQuestions();
+        }
+    });
+    
+    // Start observing the entire document body
+    observer.observe(document.body, { childList: true, subtree: true });
+    
     // Add hover effects to buttons
     const buttons = document.querySelectorAll('.btn:not(.btn-link)');
     buttons.forEach(button => {

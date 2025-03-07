@@ -1,4 +1,4 @@
-from dash import html, dcc, callback, Input, Output, State, ALL, MATCH, ctx
+from dash import html, dcc, callback, Input, Output, State, ALL, MATCH, ctx, clientside_callback
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 import dash
@@ -447,49 +447,76 @@ def create_bot_message(message_data):
     
     return html.Div(
         [
-            html.Div(
+            # Add a row structure for avatar and message content
+            dbc.Row(
                 [
-                    dcc.Markdown(
-                        content_with_tooltips,
-                        className="bot-message-text-content",
-                        dangerously_allow_html=True
+                    # Avatar column
+                    dbc.Col(
+                        html.Img(
+                            src="/assets/logo.png",
+                            className="bot-avatar",
+                            style={
+                                "width": "32px",
+                                "height": "32px",
+                                "borderRadius": "50%",
+                                "objectFit": "cover",
+                                "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"
+                            }
+                        ),
+                        width="auto",
+                        className="pe-2 d-flex align-items-start pt-1"
                     ),
-                    *citation_tooltips  # Add all tooltip components
-                ],
-                className="bot-message-text",
-                style=message_style
-            ),
-            # Only show feedback buttons if it's not the welcome message
-            html.Div(
-                [
-                    html.Div(
+                    # Message content column
+                    dbc.Col(
                         [
-                            html.Span(
-                                DashIconify(
-                                    icon="mdi:thumb-up-outline",
-                                    width=16,
-                                    color=like_style["color"]
-                                ),
-                                id={"type": "feedback-like", "index": message_id},
-                                className="feedback-btn",
-                                style=like_style,
+                            html.Div(
+                                [
+                                    dcc.Markdown(
+                                        content_with_tooltips,
+                                        className="bot-message-text-content",
+                                        dangerously_allow_html=True
+                                    ),
+                                    *citation_tooltips  # Add all tooltip components
+                                ],
+                                className="bot-message-text",
+                                style=message_style
                             ),
-                            html.Span(
-                                DashIconify(
-                                    icon="mdi:thumb-down-outline",
-                                    width=16,
-                                    color=dislike_style["color"]
-                                ),
-                                id={"type": "feedback-dislike", "index": message_id},
-                                className="feedback-btn",
-                                style=dislike_style,
-                            ),
-                        ],
-                        className="d-flex align-items-center"
-                    ),
+                            # Only show feedback buttons if it's not the welcome message
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Span(
+                                                DashIconify(
+                                                    icon="mdi:thumb-up-outline",
+                                                    width=16,
+                                                    color=like_style["color"]
+                                                ),
+                                                id={"type": "feedback-like", "index": message_id},
+                                                className="feedback-btn",
+                                                style=like_style,
+                                            ),
+                                            html.Span(
+                                                DashIconify(
+                                                    icon="mdi:thumb-down-outline",
+                                                    width=16,
+                                                    color=dislike_style["color"]
+                                                ),
+                                                id={"type": "feedback-dislike", "index": message_id},
+                                                className="feedback-btn",
+                                                style=dislike_style,
+                                            ),
+                                        ],
+                                        className="d-flex align-items-center"
+                                    ),
+                                ],
+                                className="d-flex justify-content-end message-feedback mt-2 small",
+                                style={"display": "none" if is_welcome_message else "flex"}
+                            )
+                        ]
+                    )
                 ],
-                className="d-flex justify-content-end message-feedback mt-2 small",
-                style={"display": "none" if is_welcome_message else "flex"}
+                className="g-0"
             )
         ],
         className="bot-message mb-3",
@@ -537,17 +564,17 @@ def create_chatbot_component():
     # Create welcome message data
     welcome_message = {
         "id": "welcome-message",
-        "content": """👁️ **Welcome to Data Privacy Assist!**
+        "content": """**Welcome to Data Privacy Assist!**
 
 I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines and public sector data security standards. I provide data-driven insights to help you confidently manage privacy risks and ensure compliant data sharing.
 
 **Here's how I can assist you:**
 
-- ✅ Evaluate privacy risks specific to your dataset.
-- ✅ Recommend suitable privacy protection measures.
-- ✅ Guide you clearly through IM8 compliance and data classification.
-- ✅ Provide practical data quality metrics to communicate clearly with data requestors.
-- ✅ Suggest trusted Singapore government-developed privacy tools (Mirage, Cloak, enTrust).
+- Evaluate privacy risks specific to your dataset.
+- Recommend suitable privacy protection measures.
+- Guide you clearly through IM8 compliance and data classification.
+- Provide practical data quality metrics to communicate clearly with data requestors.
+- Suggest trusted Singapore government-developed privacy tools (Mirage, Cloak, enTrust).
 
 **Getting started:**
 1. Upload your dataset using the panel on the left.
@@ -645,7 +672,9 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 ],
                                 id={"type": "suggested-question", "index": 0},
                                 action=True,
-                                className="border-0 suggested-question"
+                                n_clicks=0,  # Initialize click counter
+                                className="border-0 suggested-question",
+                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -660,7 +689,9 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 ],
                                 id={"type": "suggested-question", "index": 1},
                                 action=True,
-                                className="border-0 suggested-question"
+                                n_clicks=0,  # Initialize click counter
+                                className="border-0 suggested-question",
+                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -675,7 +706,9 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 ],
                                 id={"type": "suggested-question", "index": 2},
                                 action=True,
-                                className="border-0 suggested-question"
+                                n_clicks=0,  # Initialize click counter
+                                className="border-0 suggested-question",
+                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -690,7 +723,9 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 ],
                                 id={"type": "suggested-question", "index": 3},
                                 action=True,
-                                className="border-0 suggested-question"
+                                n_clicks=0,  # Initialize click counter
+                                className="border-0 suggested-question",
+                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -705,7 +740,9 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 ],
                                 id={"type": "suggested-question", "index": 4},
                                 action=True,
-                                className="border-0 suggested-question"
+                                n_clicks=0,  # Initialize click counter
+                                className="border-0 suggested-question",
+                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -720,7 +757,9 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 ],
                                 id={"type": "suggested-question", "index": 5},
                                 action=True,
-                                className="border-0 suggested-question"
+                                n_clicks=0,  # Initialize click counter
+                                className="border-0 suggested-question",
+                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -735,7 +774,9 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 ],
                                 id={"type": "suggested-question", "index": 6},
                                 action=True,
-                                className="border-0 suggested-question"
+                                n_clicks=0,  # Initialize click counter
+                                className="border-0 suggested-question",
+                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -750,7 +791,9 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 ],
                                 id={"type": "suggested-question", "index": 7},
                                 action=True,
-                                className="border-0 suggested-question"
+                                n_clicks=0,  # Initialize click counter
+                                className="border-0 suggested-question",
+                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
                             ),
                         ],
                         flush=True,
@@ -858,48 +901,79 @@ def store_feedback(like_clicks_list, dislike_clicks_list, feedback_ids, feedback
     return json.dumps(feedback_data)
 
 
-# Callback to populate chat input with suggested question
+# Implement both server-side and client-side callbacks for suggested questions
+
+# Client-side callback for immediate response - removing to avoid duplicate callback issue
+# For now, we'll rely on the server-side callback, which is already working
+
+# Callback to populate chat input with suggested question text when clicked
 @callback(
-    Output("user-input", "value", allow_duplicate=True),
+    Output("user-input", "value", allow_duplicate="initial_duplicate"),
     Input({"type": "suggested-question", "index": ALL}, "n_clicks"),
     State({"type": "suggested-question", "index": ALL}, "children"),
     prevent_initial_call=True
 )
 def populate_suggested_question(n_clicks_list, question_texts):
     """When a suggested question is clicked, populate it in the chat input field."""
+    # Debug logging
+    print("\n=== SUGGESTED QUESTION CALLBACK TRIGGERED ===\n")
+    print(f"n_clicks_list: {n_clicks_list}")
+    print(f"question_texts: {str(question_texts)[:200]}...")
+    print(f"triggered_id: {ctx.triggered_id}")
+    
+    # Safety check
     if not ctx.triggered_id:
+        print("No triggered_id found, preventing update")
         raise PreventUpdate
+    
+    # Find which suggestion was clicked
+    if not any(n_clicks and n_clicks > 0 for n_clicks in n_clicks_list):
+        print("No clicks detected, preventing update")
+        raise PreventUpdate
+    
+    try:    
+        # Get the index of the clicked question
+        question_index = ctx.triggered_id["index"]
+        print(f"Question index: {question_index}")
         
-    # Get the index of the clicked question
-    question_index = ctx.triggered_id["index"]
-    
-    # Find the corresponding question text
-    if isinstance(question_index, int):
-        # Direct index match
-        # Need to extract only the text part, since the children now include an icon and text
-        if isinstance(question_texts[question_index], list):
-            # Get only the text part (second item in list)
-            question_text = question_texts[question_index][1]
-        else:
-            question_text = question_texts[question_index]
-    else:
-        # Find the matching index in the list
-        for i, clicks in enumerate(n_clicks_list):
-            if i == question_index and clicks:
-                if isinstance(question_texts[i], list):
-                    # Get only the text part (second item in list)
-                    question_text = question_texts[i][1]
+        # Extract the text content from the question
+        selected_question = question_texts[question_index]
+        print(f"Selected question (raw): {selected_question}")
+        
+        # Extract just the text part, not the icon
+        if isinstance(selected_question, list):
+            # The question contains multiple elements (typically icon and text)
+            # The text element is the second item in the list
+            if len(selected_question) > 1:
+                question_text = selected_question[1]
+                if isinstance(question_text, str):
+                    print(f"Extracted question text: {question_text}")
                 else:
-                    question_text = question_texts[i]
-                break
+                    # Handle the case when the second element might be another component
+                    question_text = str(selected_question[1])
+                    print(f"Converted question component to text: {question_text}")
+            else:
+                # If there's only one element, use it
+                question_text = str(selected_question[0])
+                print(f"Using first element as text: {question_text}")
         else:
-            # No match found
-            raise PreventUpdate
+            # If it's not a list, use it directly
+            question_text = str(selected_question)
+            print(f"Using question as is: {question_text}")
+        
+        # Log the selection
+        logger.info(f"Suggested question selected: {question_text}")
+        
+        # Return the question text to populate the input field
+        return question_text
     
-    logger.info(f"Suggested question selected: {question_text}")
-    
-    # Return the question text to populate the input field
-    return question_text
+    except Exception as e:
+        print(f"Error in populate_suggested_question: {e}")
+        import traceback
+        traceback_str = traceback.format_exc()
+        print(f"Traceback: {traceback_str}")
+        logger.error(f"Error in populate_suggested_question: {e}\n{traceback_str}")
+        raise PreventUpdate
 
 # Callback to show a modal with full citation information
 @callback(

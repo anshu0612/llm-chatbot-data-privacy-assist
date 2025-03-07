@@ -85,20 +85,22 @@ app.layout = html.Div(
                                     [
                                         html.H4(
                                             "Data Upload",
-                                            className="mb-3 d-flex align-items-center",
+                                            className="mb-2 d-flex align-items-center",
                                             style={
                                                 "fontFamily": "'Roboto', sans-serif",
                                                 "color": "var(--neutral-800)",
-                                                "paddingBottom": "10px",
+                                                "paddingBottom": "5px",
                                                 "fontWeight": "500",
                                                 "borderBottom": "1px solid var(--neutral-300)",
                                             }
                                         ),
-                                        html.P("Upload your dataset to begin privacy and quality assessment", className="text-muted mb-3"),
+                                        html.P("Upload your dataset to begin privacy and quality assessment", 
+                                              className="text-muted mb-2",
+                                              style={"fontSize": "0.9rem", "marginTop": "0"}),
                                         create_upload_component(),
                                         html.Div(id="upload-info-container")
                                     ],
-                                    className="p-4 mb-4",
+                                    className="p-3 mb-3",
                                     style={
                                         "backgroundColor": "var(--surface)",
                                         "border": "1px solid var(--neutral-300)",
@@ -110,7 +112,7 @@ app.layout = html.Div(
                             width=12,
                         )
                     ],
-                    className="mt-4",
+                    className="mt-1",
                 ),
 
                 # Analysis Panels (Shown after data upload)
@@ -277,7 +279,7 @@ app.layout = html.Div(
                                     [
                                         html.Img(
                                             src="/assets/logo.png", 
-                                            height="40px",
+                                            height="100px",
                                             className="mb-2"
                                         ),
                                         html.P(
@@ -344,7 +346,7 @@ app.layout = html.Div(
                 )
             ],
             fluid=True,
-            className="py-4",
+            className="py-2",
         ),
     ],
     className="min-vh-100",
@@ -511,7 +513,7 @@ def generate_quality_report_callback(n_clicks, report_format, privacy_data, qual
 @app.callback(
     Output("chat-messages", "children"),
     Output("chat-history-store", "data"),
-    Output("user-input", "value"),  # Clear the input field after sending
+    Output("user-input", "value", allow_duplicate="initial_duplicate"),  # Clear the input field after sending
     [Input("send-button", "n_clicks"), Input("user-input", "n_submit")],  # Trigger on button click or Enter key
     State("user-input", "value"),
     State("chat-messages", "children"),
@@ -527,9 +529,33 @@ def process_message(n_clicks, n_submit, user_input, current_messages, chat_histo
     # Format user message for display
     user_message_component = html.Div(
         [
-            html.Div(
-                user_input,
-                className="user-message-text"
+            dbc.Row(
+                [
+                    # Message content column
+                    dbc.Col(
+                        html.Div(
+                            user_input,
+                            className="user-message-text"
+                        ),
+                        className="text-end"
+                    ),
+                    # User avatar column (placeholder avatar using an icon)
+                    dbc.Col(
+                        html.Div(
+                            DashIconify(
+                                icon="mdi:account-circle",
+                                width=32,
+                                height=32,
+                                color="#6E7780",  # A neutral gray color
+                                className="user-avatar"
+                            ),
+                            style={"paddingLeft": "8px"}
+                        ),
+                        width="auto",
+                        className="d-flex align-items-start pt-1"
+                    )
+                ],
+                className="g-0"
             )
         ],
         className="user-message mb-3 d-flex justify-content-end"

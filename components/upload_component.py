@@ -9,14 +9,19 @@ def create_upload_component():
                 id="upload-data",
                 children=html.Div(
                     [
-                        html.Div("Drag and Drop or Select a CSV File", className="upload-text", style={"fontSize": "0.95rem"}),
-                        html.Div("Supported formats: CSV, Excel", className="upload-hint small text-muted"),
+                        html.Div("Drag and Drop or Select a CSV File", 
+                                className="upload-text", 
+                                style={"fontSize": "0.9rem", "marginBottom": "2px"}),
+                        # html.Div("Supported formats: CSV, Excel", 
+                        #         className="upload-hint small text-muted", 
+                        #         style={"fontSize": "0.75rem"}),
                     ],
                     className="upload-area d-flex flex-column align-items-center justify-content-center",
+                    style={"padding": "8px 0"},
                 ),
                 style={
                     "width": "100%",
-                    "height": "80px",
+                    "height": "60px",  # Reduced height
                     "borderRadius": "8px",
                     "cursor": "pointer",
                     "backgroundColor": "#F8FAFC",
@@ -26,7 +31,7 @@ def create_upload_component():
                 accept=".csv, .xls, .xlsx",
             ),
             html.Div(id="upload-status"),
-            html.Div(id="upload-info-container", className="mt-3"),
+            html.Div(id="upload-info-container", className="mt-2"),  # Reduced margin
         ],
-        className="mb-4",
+        className="mb-2",  # Reduced margin
     )
