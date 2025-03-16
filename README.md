@@ -1,6 +1,6 @@
 # DataSharingAssist
 
-![DataSharingAssist Logo](assets/logo.png)
+<img src="assets/logo.png" alt="DataSharingAssist Logo" width="200"/>
 
 ## 🔒 Smart Data Sharing & Privacy Solution
 
