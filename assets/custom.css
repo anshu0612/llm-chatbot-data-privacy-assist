@@ -1,0 +1,192 @@
+/* Typing indicator animation */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.typing-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #4361ee;
+  margin-right: 4px;
+  animation: typing-dot-bounce 1.4s infinite ease-in-out;
+  animation-fill-mode: both;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-dot-bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+.chat-loading-container {
+  background-color: #f5f8ff;
+  border-radius: 12px;
+  padding: 8px 16px;
+  box-shadow: 0 1px 2px rgba(67, 97, 238, 0.15);
+  max-width: fit-content;
+}
+
+/* Privacy assessment tab styling */
+.nav-tabs .nav-link:hover {
+  color: #3a0ca3 !important;
+  border-color: transparent transparent #e9ecef !important;
+  background-color: rgba(67, 97, 238, 0.05) !important;
+}
+
+.nav-tabs .nav-link.active {
+  border-bottom: 2px solid #3a0ca3 !important;
+  color: #3a0ca3 !important;
+  font-weight: 500 !important;
+}
+
+.nav-tabs .nav-link {
+  transition: all 0.3s ease;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.5rem 1rem;
+}
+
+#privacy-metric-tabs .nav-link:hover {
+  color: #3a0ca3 !important;
+  background-color: rgba(67, 97, 238, 0.05) !important;
+}
+
+#privacy-metric-tabs .nav-link.active {
+  color: #3a0ca3 !important;
+  font-weight: 500;
+  background-color: transparent !important;
+  border-bottom: 2px solid #3a0ca3 !important;
+}
+
+/* Technical view toggles */
+#view-mode-toggle .btn:hover {
+  background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%) !important;
+  border-color: #3a0ca3 !important;
+  color: white !important;
+}
+
+/* Send button styling */
+.send-button {
+  background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%) !important;
+  border-color: transparent !important;
+  transition: all 0.2s ease;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin-left: 0 !important;
+  border-left: none !important;
+}
+
+.send-button:hover {
+  transform: none;
+  box-shadow: 0 2px 4px rgba(67, 97, 238, 0.15);
+}
+
+/* Chat message styling */
+.user-message-text {
+  background-color: #4895ef !important;
+  color: white !important;
+  border-radius: 18px 18px 0 18px !important;
+  box-shadow: 0 2px 5px rgba(67, 97, 238, 0.1);
+}
+
+.bot-message-text {
+  background-color: #f8f9fd !important;
+  border-left: 3px solid #4361ee !important;
+  border-radius: 18px 18px 18px 0 !important;
+  box-shadow: 0 2px 5px rgba(67, 97, 238, 0.1);
+}
+
+/* Tab styling */
+.nav-tabs .nav-link.active {
+  color: #3a0ca3 !important;
+  border-bottom-color: #3a0ca3 !important;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+  color: #4361ee !important;
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: #4361ee !important;
+  border-color: #4361ee !important;
+}
+
+.btn-primary:hover {
+  background-color: #3a0ca3 !important;
+  border-color: #3a0ca3 !important;
+}
+
+/* Card styling */
+.card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 16px rgba(67, 97, 238, 0.15);
+}
+
+/* File Upload Component Styling */
+#upload-data {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+#upload-data:hover {
+  border-color: rgba(67, 97, 238, 0.6) !important;
+  box-shadow: 0 3px 8px rgba(67, 97, 238, 0.08) !important;
+  transform: translateY(-1px);
+}
+
+#upload-data:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(67, 97, 238, 0.1) !important;
+}
+
+#upload-data .upload-text {
+  transition: all 0.3s ease;
+}
+
+#upload-data:hover .upload-text {
+  transform: scale(1.01);
+  color: #4361ee;
+}
+
+/* Keep minimal borders only where needed for visual alignment */
+.chat-container, .chat-input, .input-group {
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+}
+
+.form-control:focus {
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}

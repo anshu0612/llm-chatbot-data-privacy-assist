@@ -1,4 +1,4 @@
-from dash import html, dcc, callback, Input, Output, State, ALL, MATCH, ctx, clientside_callback
+from dash import html, dcc, callback, Input, Output, State, ALL, MATCH, ctx, clientside_callback, no_update
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 import dash
@@ -9,6 +9,8 @@ import uuid
 from datetime import datetime
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
+from langchain.chat_models.base import BaseChatModel
 from langchain.prompts import ChatPromptTemplate
 import json
 
@@ -55,29 +57,49 @@ def check_api_key():
     
     return True, "API key format appears valid"
 
-# Initialize OpenAI chat model
+# Get model provider from environment variable or default to 'openai'
+LLM_PROVIDER = "openai" #os.getenv("LLM_PROVIDER", "openai").lower()
+
+# Initialize the appropriate chat model based on provider
 try:
-    # Check API key validity
-    key_valid, key_message = check_api_key()
-    if not key_valid:
-        raise ValueError(key_message)
+    if LLM_PROVIDER == "anthropic":
+        print("*"*1000)
+        # Check if Anthropic API key is set
+        anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+        print("Anthropi's:", anthropic_api_key)
+        if not anthropic_api_key:
+            logger.error("ANTHROPIC_API_KEY environment variable is not set")
+            raise ValueError("Anthropic API key not found in environment variables")
         
-    # Get API key from environment variable
-    api_key = os.getenv("OPENAI_API_KEY")
-    
-    llm = ChatOpenAI(
-        model_name="gpt-4o-mini",
-        temperature=0,
-        api_key=api_key
-    )
-    logger.info("ChatOpenAI initialized with API key from environment variable")
+        llm = ChatAnthropic(
+            model_name="claude-3-7-sonnet-20250219",  # Corresponds to Claude 3 Haiku
+            temperature=0,
+            anthropic_api_key=anthropic_api_key,
+            max_tokens=4096
+        )
+        logger.info("ChatAnthropic initialized with API key from environment variable")
+    else:  # Default to OpenAI
+        # Check API key validity
+        key_valid, key_message = check_api_key()
+        if not key_valid:
+            raise ValueError(key_message)
+            
+        # Get API key from environment variable
+        api_key = os.getenv("OPENAI_API_KEY")
+        
+        llm = ChatOpenAI(
+            model_name="gpt-4o", #"gpt-4o-mini",
+            temperature=0,
+            api_key=api_key
+        )
+        logger.info("ChatOpenAI initialized with API key from environment variable")
 except Exception as e:
-    logger.error(f"Error initializing OpenAI: {e}")
+    logger.error(f"Error initializing LLM: {e}")
     llm = None
 
 # Default system prompt for the privacy assistant
 DEFAULT_SYSTEM_PROMPT = """
-You are a Data Privacy Assistant supporting data providers by evaluating privacy risks and offering tailored, data-driven recommendations for managing privacy risks in their datasets. Your responses must align closely with Singapore's IM8 guidelines and other relevant government privacy regulations.
+You are a DataSharingAssist AI supporting data providers by evaluating privacy risks and offering tailored, data-driven recommendations for managing privacy risks in their datasets. Your responses must align closely with Singapore's IM8 guidelines and other relevant government privacy regulations.
 
 When recommending actions, always:
 
@@ -120,18 +142,35 @@ Use the following classification levels to recommend appropriate security and se
 
 Always reference specific IM8 sections or Singapore government privacy guidelines explicitly when relevant, maintaining a clear, actionable, and supportive communication style.
 
+You should avoid answering questions that are not related to data sharing. Skip them politely.
+
 Current dataset context:
 {privacy_context}
 {quality_context}
 """
 
-# Create the chat prompt template with RAG support
-rag_chat_prompt = ChatPromptTemplate.from_messages([
-    ("system", DEFAULT_SYSTEM_PROMPT),
-    ("system", "Relevant Singapore policy information: {rag_context}"),
-    ("system", "When referencing policies, use citation markers like [1], [2], etc. and provide a list of references at the end."),
-    ("human", "{input}"),
-])
+# Create provider-specific chat prompt templates with RAG support
+def get_prompt_template():
+    """Get the appropriate prompt template based on the LLM provider"""
+    if LLM_PROVIDER == "anthropic":
+        # Claude models only support a single system message, so we need to combine them
+        combined_system_prompt = f"""{DEFAULT_SYSTEM_PROMPT}
+
+Relevant Singapore policy information: {{rag_context}}
+
+When referencing policies, use citation markers like [1], [2], etc. and provide a list of references at the end."""
+        
+        return ChatPromptTemplate.from_messages([
+            ("system", combined_system_prompt),
+            ("human", "{input}"),
+        ])
+    else:  # OpenAI and others can handle multiple system messages
+        return ChatPromptTemplate.from_messages([
+            ("system", DEFAULT_SYSTEM_PROMPT),
+            ("system", "Relevant Singapore policy information: {rag_context}"),
+            ("system", "When referencing policies, use citation markers like [1], [2], etc. and provide a list of references at the end."),
+            ("human", "{input}"),
+        ])
 
 def _add_citation_markers(text, citations):
     """
@@ -242,6 +281,13 @@ def _generate_reference_section(citations):
     
     return "\n".join(lines)
 
+# Get the model provider name
+def get_provider_name() -> str:
+    """Get the name of the current LLM provider"""
+    return "Anthropic Claude" if os.getenv("LLM_PROVIDER", "openai").lower() == "anthropic" else "OpenAI"
+
+# This section was cleaned up since loading animation is now handled in app.py
+
 def process_chat_message(user_input, chat_history, privacy_context, quality_context):
     """Process a user message and return the chatbot's response, enhanced with RAG."""
     if llm is None:
@@ -290,7 +336,8 @@ def process_chat_message(user_input, chat_history, privacy_context, quality_cont
     # Get the response from the model
     try:
         if llm is None:
-            raise ValueError("OpenAI client is not initialized. Please check your API key.")
+            provider_name = get_provider_name()
+            raise ValueError(f"{provider_name} client is not initialized. Please check your API key.")
         
         # Format the variables for the prompt
         formatted_variables = {
@@ -300,13 +347,45 @@ def process_chat_message(user_input, chat_history, privacy_context, quality_cont
             "rag_context": rag_context_data["context"]
         }
         
-        # Format the prompt with the variables
+        # Get the appropriate prompt template and format it with the variables
+        rag_chat_prompt = get_prompt_template()
         formatted_messages = rag_chat_prompt.format_messages(**formatted_variables)
             
-        logger.info("Sending request to OpenAI API...")
-        response = llm.invoke(formatted_messages)
-        content = response.content
-        logger.info("Successfully received response from OpenAI API")
+        provider_name = get_provider_name()
+        logger.info(f"Sending request to {provider_name} API...")
+        
+        # Log the message format for debugging
+        logger.info(f"Formatted messages: {formatted_messages}")
+        
+        try:
+            response = llm.invoke(formatted_messages)
+            content = response.content
+            logger.info(f"Successfully received response from {provider_name} API")
+        except Exception as e:
+            # Detailed error logging
+            logger.error(f"Error during {provider_name} API call: {e}")
+            logger.error(f"Error type: {type(e).__name__}")
+            
+            if LLM_PROVIDER == "anthropic":
+                # Additional Anthropic-specific debugging
+                try:
+                    # Try with a very simple message to test basic connectivity
+                    from langchain_core.messages import SystemMessage, HumanMessage
+                    simple_messages = [
+                        SystemMessage(content="You are a helpful assistant."),
+                        HumanMessage(content="Say hello")
+                    ]
+                    logger.info("Attempting simple message test with Anthropic...")
+                    simple_response = llm.invoke(simple_messages)
+                    logger.info(f"Simple message test succeeded: {simple_response.content}")
+                    # If simple message works but complex one doesn't, it's likely a message format issue
+                    logger.error("The issue appears to be with the message format, not connectivity.")
+                except Exception as inner_e:
+                    logger.error(f"Simple message test also failed: {inner_e}")
+                    logger.error("This suggests a fundamental connectivity or authentication issue.")
+            
+            # Re-raise the exception to be caught by the outer try/except
+            raise
         
         # Add citation references to response if there are citations
         reference_section = ""
@@ -322,25 +401,31 @@ def process_chat_message(user_input, chat_history, privacy_context, quality_cont
             "id": str(uuid.uuid4()),  # Generate a unique ID for the message
             "timestamp": datetime.now().isoformat(),
             "feedback": None,  # Initialize with no feedback
-            "citations": citations  # Include citation information
+            "citations": citations,  # Include citation information
+            "provider": get_provider_name()  # Add provider information
         }
     except ValueError as e:
         # Handle API key issues
         error_message = str(e)
-        logger.error(f"OpenAI API key error: {error_message}")
+        provider_name = get_provider_name()
+        env_var = "ANTHROPIC_API_KEY" if provider_name == "Anthropic Claude" else "OPENAI_API_KEY"
+        logger.error(f"{provider_name} API key error: {error_message}")
         return {
-            "content": f"Error: {error_message}. Please set your OPENAI_API_KEY environment variable with a valid API key.",
+            "content": f"Error: {error_message}. Please set your {env_var} environment variable with a valid API key.",
             "id": str(uuid.uuid4()),
             "timestamp": datetime.now().isoformat(),
             "feedback": None,
-            "citations": []
+            "citations": [],
+            "provider": provider_name
         }
     except Exception as e:
         # Handle other errors
-        logger.error(f"Error getting response from OpenAI: {e}")
+        provider_name = get_provider_name()
+        logger.error(f"Error getting response from {provider_name}: {e}")
         return {
             "content": f"I'm sorry, I encountered an error while processing your request: {str(e)}. Please check your API key and network connection.",
             "id": str(uuid.uuid4()),
+            "provider": provider_name,
             "timestamp": datetime.now().isoformat(),
             "feedback": None,
             "citations": []
@@ -439,8 +524,8 @@ def create_bot_message(message_data):
     message_style = {}
     if feedback:
         message_style = {
-            "backgroundColor": "#F0F9FF" if feedback == "like" else "#FFF5F5",
-            "borderLeft": f"3px solid {'var(--primary)' if feedback == 'like' else 'var(--error)'}",
+            "backgroundColor": "#f0f5ff" if feedback == "like" else "#fff0f7",
+            "borderLeft": f"3px solid {'#4361ee' if feedback == 'like' else '#7209b7'}",
             "padding": "12px",
             "borderRadius": "4px"
         }
@@ -460,7 +545,7 @@ def create_bot_message(message_data):
                                 "height": "32px",
                                 "borderRadius": "50%",
                                 "objectFit": "cover",
-                                "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"
+                                "boxShadow": "0 2px 4px rgba(67, 97, 238, 0.2)"
                             }
                         ),
                         width="auto",
@@ -523,50 +608,19 @@ def create_bot_message(message_data):
         id={"type": "bot-message", "index": message_id}
     )
 
-def create_api_diagnostic_button():
-    """Create a button to diagnose API key issues"""
-    return html.Div(
-        [
-            dbc.Button(
-                [
-                    DashIconify(
-                        icon="mdi:api",
-                        width=18,
-                        height=18,
-                        className="me-2"
-                    ),
-                    "Check API Connection"
-                ],
-                id="api-diagnostic-button",
-                color="light",
-                className="mb-3 api-connection-btn",
-                size="sm",
-                outline=False
-            ),
-            dbc.Collapse(
-                dbc.Card(
-                    dbc.CardBody(
-                        [
-                            html.P(id="api-diagnostic-result", className="mb-0")
-                        ]
-                    ),
-                    className="mb-3",
-                    style={"background-color": "#f8f9fa"}
-                ),
-                id="api-diagnostic-collapse",
-                is_open=False,
-            ),
-        ]
-    )
+# API diagnostic button has been removed
 
 def create_chatbot_component():
     """Create the chatbot component."""
+    # Create a store for loading state
+    loading_state_store = dcc.Store(id="chat-loading-state", data=False)
+    
     # Create welcome message data
     welcome_message = {
         "id": "welcome-message",
-        "content": """**Welcome to Data Privacy Assist!**
+        "content": """**Welcome to DataSharingAssist!**
 
-I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines and public sector data security standards. I provide data-driven insights to help you confidently manage privacy risks and ensure compliant data sharing.
+I'm your AI-powered data sharing and privacy assistant, aligned with Singapore's IM8 guidelines and public sector data security standards. I provide data-driven insights to help you confidently manage privacy risks and ensure compliant data sharing.
 
 **Here's how I can assist you:**
 
@@ -591,23 +645,31 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
             # Hidden div to store feedback data
             html.Div(id="feedback-store", style={"display": "none"}, children=json.dumps([])),
             
-            # API diagnostic button
-            create_api_diagnostic_button(),
+            # Store for tracking loading state
+            loading_state_store,
             
             html.Div(
                 [
+                    # Main chat messages container
                     html.Div(
                         [
                             create_bot_message(welcome_message),
                         ],
                         id="chat-messages",
                         className="chat-messages p-3",
-                        style={"height": "400px", "overflowY": "auto"},
+                        style={
+                            "flexGrow": "1", 
+                            "overflowY": "auto", 
+                            "minHeight": "300px", 
+                            "maxHeight": "360px",
+                            "scrollBehavior": "smooth"  # Enable smooth scrolling
+                        },
                     ),
                     html.Div(
                         [
                             dbc.InputGroup(
                                 [
+                                
                                     dbc.Input(
                                         id="user-input",
                                         placeholder="Ask a question about data privacy...",
@@ -624,15 +686,17 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                         ],
                                         id="send-button",
                                         color="primary",
-                                        className="send-button"
+                                        className="send-button",
+                                        style={"borderRadius": "0"}
                                     ),
                                 ]
                             ),
                         ],
-                        className="chat-input p-3",
+                        className="chat-input px-3 pb-3 pt-2",
                     ),
                 ],
-                className="chat-container",
+                className="chat-container d-flex flex-column",
+                style={"flex": "1", "minHeight": "300px", "maxHeight": "450px"},
             ),
             # Removed feedback toast
             # Citation modal for displaying full citation details
@@ -653,19 +717,15 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
             ),
             html.Div(
                 [
-                    html.H6(
-                        "Guiding Questions", 
-                        className="mb-3 suggested-questions-title"
-                    ),
                     dbc.ListGroup(
                         [
                             dbc.ListGroupItem(
                                 [
                                     DashIconify(
                                         icon="mdi:robot",
-                                        width=16,
-                                        height=16,
-                                        color="#0066CC",
+                                        width=18,
+                                        height=18,
+                                        color="#4361ee",
                                         className="me-2"
                                     ),
                                     "What privacy risks exist in my dataset?"
@@ -673,16 +733,16 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 id={"type": "suggested-question", "index": 0},
                                 action=True,
                                 n_clicks=0,  # Initialize click counter
-                                className="border-0 suggested-question",
-                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
+                                className="border-0 suggested-question guided-question",
+                                style={"cursor": "pointer", "transition": "all 0.2s ease"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
                                     DashIconify(
                                         icon="mdi:folder-eye",
-                                        width=16,
-                                        height=16,
-                                        color="#0066CC",
+                                        width=18,
+                                        height=18,
+                                        color="#4361ee",
                                         className="me-2"
                                     ),
                                     "What security and sensitivity classification level is appropriate for my dataset?"
@@ -690,8 +750,8 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 id={"type": "suggested-question", "index": 1},
                                 action=True,
                                 n_clicks=0,  # Initialize click counter
-                                className="border-0 suggested-question",
-                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
+                                className="border-0 suggested-question guided-question",
+                                style={"cursor": "pointer", "transition": "all 0.2s ease"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -699,7 +759,7 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                         icon="mdi:shield-lock",
                                         width=16,
                                         height=16,
-                                        color="#0066CC",
+                                        color="#4361ee",
                                         className="me-2"
                                     ),
                                     "How can GovTech privacy tools support my data-sharing needs?"
@@ -707,8 +767,8 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 id={"type": "suggested-question", "index": 2},
                                 action=True,
                                 n_clicks=0,  # Initialize click counter
-                                className="border-0 suggested-question",
-                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
+                                className="border-0 suggested-question guided-question",
+                                style={"cursor": "pointer", "transition": "all 0.2s ease"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -716,7 +776,7 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                         icon="mdi:file-document",
                                         width=16,
                                         height=16,
-                                        color="#0066CC",
+                                        color="#4361ee",
                                         className="me-2"
                                     ),
                                     "How can I use Cloak to safely down-classify my dataset?"
@@ -724,8 +784,8 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 id={"type": "suggested-question", "index": 3},
                                 action=True,
                                 n_clicks=0,  # Initialize click counter
-                                className="border-0 suggested-question",
-                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
+                                className="border-0 suggested-question guided-question",
+                                style={"cursor": "pointer", "transition": "all 0.2s ease"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -733,7 +793,7 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                         icon="mdi:chart-line",
                                         width=16,
                                         height=16,
-                                        color="#0066CC",
+                                        color="#4361ee",
                                         className="me-2"
                                     ),
                                     "What metrics should I consider when evaluating data quality?"
@@ -741,8 +801,8 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 id={"type": "suggested-question", "index": 4},
                                 action=True,
                                 n_clicks=0,  # Initialize click counter
-                                className="border-0 suggested-question",
-                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
+                                className="border-0 suggested-question guided-question",
+                                style={"cursor": "pointer", "transition": "all 0.2s ease"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -750,7 +810,7 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                         icon="mdi:message-text",
                                         width=16,
                                         height=16,
-                                        color="#0066CC",
+                                        color="#4361ee",
                                         className="me-2"
                                     ),
                                     "What data limitations in my dataset I should communicate to the data requestor?"
@@ -758,8 +818,8 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 id={"type": "suggested-question", "index": 5},
                                 action=True,
                                 n_clicks=0,  # Initialize click counter
-                                className="border-0 suggested-question",
-                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
+                                className="border-0 suggested-question guided-question",
+                                style={"cursor": "pointer", "transition": "all 0.2s ease"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -767,7 +827,7 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                         icon="mdi:scale-balance",
                                         width=16,
                                         height=16,
-                                        color="#0066CC",
+                                        color="#4361ee",
                                         className="me-2"
                                     ),
                                     "Which privacy measures balance protection with data quality?"
@@ -775,8 +835,8 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 id={"type": "suggested-question", "index": 6},
                                 action=True,
                                 n_clicks=0,  # Initialize click counter
-                                className="border-0 suggested-question",
-                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
+                                className="border-0 suggested-question guided-question",
+                                style={"cursor": "pointer", "transition": "all 0.2s ease"},  # Ensure cursor shows pointer
                             ),
                             dbc.ListGroupItem(
                                 [
@@ -784,7 +844,7 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                         icon="mdi:steps",
                                         width=16,
                                         height=16,
-                                        color="#0066CC",
+                                        color="#4361ee",
                                         className="me-2"
                                     ),
                                     "What steps must I follow to safely down-classify my dataset?"
@@ -792,8 +852,8 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                                 id={"type": "suggested-question", "index": 7},
                                 action=True,
                                 n_clicks=0,  # Initialize click counter
-                                className="border-0 suggested-question",
-                                style={"cursor": "pointer"},  # Ensure cursor shows pointer
+                                className="border-0 suggested-question guided-question",
+                                style={"cursor": "pointer", "transition": "all 0.2s ease"},  # Ensure cursor shows pointer
                             ),
                         ],
                         flush=True,
@@ -801,9 +861,11 @@ I'm your AI-powered privacy assistant, aligned with Singapore's IM8 guidelines a
                     ),
                 ],
                 className="suggested-questions-container",
+                style={"maxHeight": "180px", "overflowY": "auto", "marginTop": "8px"},
             ),
         ],
-        className="chat-component",
+        className="chat-component d-flex flex-column",
+        style={"height": "100%"},
     )
 
 
@@ -906,6 +968,8 @@ def store_feedback(like_clicks_list, dislike_clicks_list, feedback_ids, feedback
 # Client-side callback for immediate response - removing to avoid duplicate callback issue
 # For now, we'll rely on the server-side callback, which is already working
 
+# Loading animation is now handled in app.py
+
 # Callback to populate chat input with suggested question text when clicked
 @callback(
     Output("user-input", "value", allow_duplicate="initial_duplicate"),
@@ -916,10 +980,10 @@ def store_feedback(like_clicks_list, dislike_clicks_list, feedback_ids, feedback
 def populate_suggested_question(n_clicks_list, question_texts):
     """When a suggested question is clicked, populate it in the chat input field."""
     # Debug logging
-    print("\n=== SUGGESTED QUESTION CALLBACK TRIGGERED ===\n")
-    print(f"n_clicks_list: {n_clicks_list}")
-    print(f"question_texts: {str(question_texts)[:200]}...")
-    print(f"triggered_id: {ctx.triggered_id}")
+    # print("\n=== SUGGESTED QUESTION CALLBACK TRIGGERED ===\n")
+    # print(f"n_clicks_list: {n_clicks_list}")
+    # print(f"question_texts: {str(question_texts)[:200]}...")
+    # print(f"triggered_id: {ctx.triggered_id}")
     
     # Safety check
     if not ctx.triggered_id:
@@ -1026,46 +1090,4 @@ def close_citation_modal(n_clicks):
         return False
     raise PreventUpdate
 
-# API Diagnostic callback
-@callback(
-    Output("api-diagnostic-collapse", "is_open"),
-    Output("api-diagnostic-result", "children"),
-    Output("api-diagnostic-result", "style"),
-    Input("api-diagnostic-button", "n_clicks"),
-    prevent_initial_call=True
-)
-def check_api_connection(n_clicks):
-    """Check the OpenAI API connection and show diagnostic results"""
-    if not n_clicks:
-        raise PreventUpdate
-        
-    # Check if the OpenAI API key is properly set
-    key_valid, key_message = check_api_key()
-    
-    if not key_valid:
-        return True, f"🔴 API Key Error: {key_message}", {"color": "#d9534f"}
-    
-    # Try to make a simple test request to OpenAI
-    try:
-        test_llm = ChatOpenAI(
-            model_name= "gpt-4o-mini", # "gpt-4", #, #"gpt-3.5-turbo",
-            temperature=0,
-            api_key=os.getenv("OPENAI_API_KEY")
-        )
-        
-        # Make a simple test request
-        from langchain_core.messages import SystemMessage, HumanMessage
-        
-        messages = [
-            SystemMessage(content="You are a helpful assistant."),
-            HumanMessage(content="Say 'API connection successful' if you can read this message.")
-        ]
-        
-        response = test_llm.invoke(messages)
-        
-        if "API connection successful" in response.content:
-            return True, "✅ API connection successful! You can now use the chat.", {"color": "#5cb85c"}
-        else:
-            return True, f"⚠️ API connection seems to work, but received unexpected response: {response.content}", {"color": "#f0ad4e"}
-    except Exception as e:
-        return True, f"🔴 API Connection Error: {str(e)}", {"color": "#d9534f"}
+# API Diagnostic callback has been removed

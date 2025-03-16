@@ -37,5 +37,5 @@ uploads/
 *.pdf
 *.log
 
-./knowledge_base
+knowledge_base/
 training_data.jsonl

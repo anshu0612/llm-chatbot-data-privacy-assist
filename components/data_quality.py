@@ -5,85 +5,376 @@ from dash_iconify import DashIconify
 import json
 
 def create_data_quality_tab():
-    """Create the data quality assessment tab content with six dimensions and custom constraints."""
+    """Create the data quality assessment tab content with improved visual design."""
     return html.Div(
         [
             html.Div(
                 [
-                    html.P(
-                        "This tab evaluates the quality of your dataset across six key dimensions: Completeness, Accuracy, Validity, Uniqueness, Integrity, and Consistency.",
-                        className="text-muted",
-                    ),
-                    
-                    # Add dimension descriptions
+                    # Introduction section with friendly explanation
                     html.Div([
+                        html.Div(
+                            [
+                                DashIconify(
+                                    icon="mdi:database-check",
+                                    width=28,
+                                    height=28,
+                                    className="me-2",
+                                    color="#4361ee"
+                                ),
+                                html.H4("Data Quality Assessment", style={"fontWeight": "500", "color": "#3a0ca3"})
+                            ],
+                            className="d-flex align-items-center mb-2"
+                        ),
+                        html.P(
+                            "Understanding your data quality is essential for making reliable decisions. We help you identify and address quality issues across multiple dimensions.",
+                            className="mb-3",
+                        ),
+                        html.Div(
+                            [
+                                html.Span("✓", className="me-2", style={"color": "#10b981", "fontWeight": "bold"}),
+                                "Measures data completeness, accuracy, and validity"
+                            ],
+                            className="d-flex align-items-center small mb-1"
+                        ),
+                        html.Div(
+                            [
+                                html.Span("✓", className="me-2", style={"color": "#10b981", "fontWeight": "bold"}),
+                                "Identifies issues that could impact analysis results"
+                            ],
+                            className="d-flex align-items-center small mb-1"
+                        ),
+                        html.Div(
+                            [
+                                html.Span("✓", className="me-2", style={"color": "#10b981", "fontWeight": "bold"}),
+                                "Provides visualization of quality metrics"
+                            ],
+                            className="d-flex align-items-center small mb-1"
+                        ),
+                    ],
+                    className="bg-light p-3 rounded mb-4 border-start border-3",
+                    style={"borderColor": "#4361ee"}),
+                    
+                    # Dimension cards with improved visual design
+                    html.Div([
+                        html.H5("Quality Dimensions", className="mb-3", style={"color": "#3a0ca3", "fontWeight": "500"}),
+                        
                         dbc.Row([
                             dbc.Col([
-                                html.Div([
-                                    html.H6("Completeness", className="mb-1"),
-                                    html.P("Is your data complete, with no missing values or gaps?", className="small text-muted"),
-                                ], className="dimension-card p-2 mb-2")
-                            ], width=6),
+                                dbc.Card([
+                                    dbc.CardBody([
+                                        html.Div([
+                                            DashIconify(
+                                                icon="mdi:checkbox-marked-circle-outline",
+                                                width=20,
+                                                height=20,
+                                                className="me-2",
+                                                color="#4361ee"
+                                            ),
+                                            html.H6(
+                                                "Completeness", 
+                                                className="mb-0 d-inline", 
+                                                style={"color": "#3a0ca3", "fontWeight": "500"}
+                                            ),
+                                            html.Span(
+                                                DashIconify(
+                                                    icon="mdi:information-outline",
+                                                    width=16,
+                                                    height=16,
+                                                    style={"cursor": "help", "color": "#6b7280"},
+                                                    className="ms-2"
+                                                ),
+                                                id="completeness-info",
+                                            ),
+                                        ], className="d-flex align-items-center mb-2"),
+                                        dbc.Tooltip(
+                                            "Completeness measures the presence of required data. Higher completeness scores indicate fewer missing values.",
+                                            target="completeness-info",
+                                            placement="top"
+                                        ),
+                                        html.P(
+                                            "Measures whether your dataset has all the necessary values without missing data.",
+                                            className="small text-muted mb-0"
+                                        ),
+                                    ])
+                                ], className="h-100 shadow-sm", style={"border": "none"})
+                            ], md=6, className="mb-3"),
+                            
                             dbc.Col([
-                                html.Div([
-                                    html.H6("Accuracy", className="mb-1"),
-                                    html.P("Does your data correctly reflect reality and is it free of errors?", className="small text-muted"),
-                                ], className="dimension-card p-2 mb-2")
-                            ], width=6),
+                                dbc.Card([
+                                    dbc.CardBody([
+                                        html.Div([
+                                            DashIconify(
+                                                icon="mdi:target",
+                                                width=20,
+                                                height=20,
+                                                className="me-2",
+                                                color="#4361ee"
+                                            ),
+                                            html.H6(
+                                                "Accuracy", 
+                                                className="mb-0 d-inline", 
+                                                style={"color": "#3a0ca3", "fontWeight": "500"}
+                                            ),
+                                            html.Span(
+                                                DashIconify(
+                                                    icon="mdi:information-outline",
+                                                    width=16,
+                                                    height=16,
+                                                    style={"cursor": "help", "color": "#6b7280"},
+                                                    className="ms-2"
+                                                ),
+                                                id="accuracy-info",
+                                            ),
+                                        ], className="d-flex align-items-center mb-2"),
+                                        dbc.Tooltip(
+                                            "Accuracy evaluates how well data represents the real-world values it aims to model. Higher accuracy scores indicate data closely matching reality.",
+                                            target="accuracy-info",
+                                            placement="top"
+                                        ),
+                                        html.P(
+                                            "Evaluates whether data values correctly represent reality without errors.",
+                                            className="small text-muted mb-0"
+                                        ),
+                                    ])
+                                ], className="h-100 shadow-sm", style={"border": "none"})
+                            ], md=6, className="mb-3"),
+                            
+                            dbc.Col([
+                                dbc.Card([
+                                    dbc.CardBody([
+                                        html.Div([
+                                            DashIconify(
+                                                icon="mdi:check-decagram-outline",
+                                                width=20,
+                                                height=20,
+                                                className="me-2",
+                                                color="#10b981"
+                                            ),
+                                            html.H6(
+                                                "Validity", 
+                                                className="mb-0 d-inline", 
+                                                style={"color": "#3a0ca3", "fontWeight": "500"}
+                                            ),
+                                            html.Span(
+                                                DashIconify(
+                                                    icon="mdi:information-outline",
+                                                    width=16,
+                                                    height=16,
+                                                    style={"cursor": "help", "color": "#6b7280"},
+                                                    className="ms-2"
+                                                ),
+                                                id="validity-info",
+                                            ),
+                                        ], className="d-flex align-items-center mb-2"),
+                                        dbc.Tooltip(
+                                            "Validity checks if data conforms to required formats, ranges, and rules. A higher validity score means more data points meet expected criteria.",
+                                            target="validity-info",
+                                            placement="top"
+                                        ),
+                                        html.P(
+                                            "Assesses if data values follow expected formats and business rules.",
+                                            className="small text-muted mb-0"
+                                        ),
+                                    ])
+                                ], className="h-100 shadow-sm", style={"border": "none"})
+                            ], md=6, className="mb-3"),
+                            
+                            dbc.Col([
+                                dbc.Card([
+                                    dbc.CardBody([
+                                        html.Div([
+                                            DashIconify(
+                                                icon="mdi:fingerprint",
+                                                width=20,
+                                                height=20,
+                                                className="me-2",
+                                                color="#10b981"
+                                            ),
+                                            html.H6(
+                                                "Uniqueness", 
+                                                className="mb-0 d-inline", 
+                                                style={"color": "#3a0ca3", "fontWeight": "500"}
+                                            ),
+                                            html.Span(
+                                                DashIconify(
+                                                    icon="mdi:information-outline",
+                                                    width=16,
+                                                    height=16,
+                                                    style={"cursor": "help", "color": "#6b7280"},
+                                                    className="ms-2"
+                                                ),
+                                                id="uniqueness-info",
+                                            ),
+                                        ], className="d-flex align-items-center mb-2"),
+                                        dbc.Tooltip(
+                                            "Uniqueness identifies unintended duplicate records. A higher uniqueness score indicates fewer problematic duplicates in your dataset.",
+                                            target="uniqueness-info",
+                                            placement="top"
+                                        ),
+                                        html.P(
+                                            "Verifies data is free from unintended duplicates that could skew analysis.",
+                                            className="small text-muted mb-0"
+                                        ),
+                                    ])
+                                ], className="h-100 shadow-sm", style={"border": "none"})
+                            ], md=6, className="mb-3"),
+                            
+                            dbc.Col([
+                                dbc.Card([
+                                    dbc.CardBody([
+                                        html.Div([
+                                            DashIconify(
+                                                icon="mdi:link",
+                                                width=20,
+                                                height=20,
+                                                className="me-2",
+                                                color="#4361ee"
+                                            ),
+                                            html.H6(
+                                                "Integrity", 
+                                                className="mb-0 d-inline", 
+                                                style={"color": "#3a0ca3", "fontWeight": "500"}
+                                            ),
+                                            html.Span(
+                                                DashIconify(
+                                                    icon="mdi:information-outline",
+                                                    width=16,
+                                                    height=16,
+                                                    style={"cursor": "help", "color": "#6b7280"},
+                                                    className="ms-2"
+                                                ),
+                                                id="integrity-info",
+                                            ),
+                                        ], className="d-flex align-items-center mb-2"),
+                                        dbc.Tooltip(
+                                            "Integrity examines whether data maintains logical connections between related fields and tables. Higher integrity scores indicate better relationship maintenance.",
+                                            target="integrity-info",
+                                            placement="top"
+                                        ),
+                                        html.P(
+                                            "Ensures data maintains consistent relationships and referential integrity.",
+                                            className="small text-muted mb-0"
+                                        ),
+                                    ])
+                                ], className="h-100 shadow-sm", style={"border": "none"})
+                            ], md=6, className="mb-3"),
+                            
+                            dbc.Col([
+                                dbc.Card([
+                                    dbc.CardBody([
+                                        html.Div([
+                                            DashIconify(
+                                                icon="mdi:balance",
+                                                width=20,
+                                                height=20,
+                                                className="me-2",
+                                                color="#4361ee"
+                                            ),
+                                            html.H6(
+                                                "Consistency", 
+                                                className="mb-0 d-inline", 
+                                                style={"color": "#3a0ca3", "fontWeight": "500"}
+                                            ),
+                                            html.Span(
+                                                DashIconify(
+                                                    icon="mdi:information-outline",
+                                                    width=16,
+                                                    height=16,
+                                                    style={"cursor": "help", "color": "#6b7280"},
+                                                    className="ms-2"
+                                                ),
+                                                id="consistency-info",
+                                            ),
+                                        ], className="d-flex align-items-center mb-2"),
+                                        dbc.Tooltip(
+                                            "Consistency measures how uniform data values are across your dataset. Higher consistency scores indicate fewer contradictions or variations in representation.",
+                                            target="consistency-info",
+                                            placement="top"
+                                        ),
+                                        html.P(
+                                            "Evaluates if data is uniform and coherent across different systems and time periods.",
+                                            className="small text-muted mb-0"
+                                        ),
+                                    ])
+                                ], className="h-100 shadow-sm", style={"border": "none"})
+                            ], md=6, className="mb-3"),
                         ]),
-                        dbc.Row([
-                            dbc.Col([
-                                html.Div([
-                                    html.H6("Validity", className="mb-1"),
-                                    html.P("Does your data conform to specified formats, ranges, and definitions?", className="small text-muted"),
-                                ], className="dimension-card p-2 mb-2")
-                            ], width=6),
-                            dbc.Col([
-                                html.Div([
-                                    html.H6("Uniqueness", className="mb-1"),
-                                    html.P("Is your data free from unintended duplicates?", className="small text-muted"),
-                                ], className="dimension-card p-2 mb-2")
-                            ], width=6),
-                        ]),
-                        dbc.Row([
-                            dbc.Col([
-                                html.Div([
-                                    html.H6("Integrity", className="mb-1"),
-                                    html.P("Can your data be consistently traced and connected across your agency?", className="small text-muted"),
-                                ], className="dimension-card p-2 mb-2")
-                            ], width=6),
-                            dbc.Col([
-                                html.Div([
-                                    html.H6("Consistency", className="mb-1"),
-                                    html.P("Is your data stable and coherent across different systems and time periods?", className="small text-muted"),
-                                ], className="dimension-card p-2 mb-2")
-                            ], width=6),
-                        ]),
-                    ], className="mb-3 mt-3"),
+                    ], className="mb-4"),
                     
                     # Custom Quality Constraints Section
                     dbc.Card([
                         dbc.CardHeader(
-                            dbc.Button(
-                                "Custom Quality Constraints",
-                                id="custom-constraints-button",
-                                color="link",
-                                className="text-decoration-none w-100 text-start",
-                            )
+                            html.Div(
+                                [
+                                    DashIconify(
+                                        icon="mdi:tune-vertical",
+                                        width=20,
+                                        height=20,
+                                        className="me-2",
+                                        color="#4361ee"
+                                    ),
+                                    html.H6(
+                                        "Custom Quality Constraints",
+                                        className="mb-0 d-inline",
+                                        style={"fontWeight": "500"}
+                                    ),
+                                    dbc.Button(
+                                        DashIconify(
+                                            icon="mdi:chevron-down",
+                                            width=20,
+                                            height=20,
+                                        ),
+                                        id="custom-constraints-button",
+                                        color="link",
+                                        className="float-end p-0",
+                                        style={"color": "#3a0ca3"},
+                                    )
+                                ],
+                                className="d-flex align-items-center justify-content-between"
+                            ),
+                            style={"backgroundColor": "#f8f9fa", "border": "none"}
                         ),
                         dbc.Collapse(
                             dbc.CardBody([
-                                html.P(
-                                    "Define custom constraints to validate your data quality. These constraints will be checked during quality analysis.",
-                                    className="text-muted mb-3",
+                                html.Div(
+                                    [
+                                        DashIconify(
+                                            icon="mdi:lightbulb-outline",
+                                            width=18,
+                                            height=18,
+                                            color="#10b981",
+                                            className="me-2 flex-shrink-0"
+                                        ),
+                                        html.P(
+                                            "Custom constraints let you define specific quality rules for your data. These rules are checked during quality analysis and help you identify issues unique to your business context.",
+                                            className="small mb-3",
+                                        )
+                                    ],
+                                    className="d-flex align-items-start p-2 mb-3",
+                                    style={
+                                        "backgroundColor": "#ecfdf5",
+                                        "borderRadius": "4px",
+                                        "border": "1px solid rgba(16, 185, 129, 0.2)",
+                                    }
                                 ),
                                 dbc.Row([
                                     dbc.Col([
                                         html.Div(id="custom-constraints-container", children=[]),
                                         dbc.Button(
-                                            "Add Constraint",
+                                            [
+                                                DashIconify(
+                                                    icon="mdi:plus",
+                                                    width=16,
+                                                    height=16,
+                                                    className="me-1"
+                                                ),
+                                                "Add Constraint"
+                                            ],
                                             id="add-constraint-btn",
-                                            color="secondary",
+                                            style={
+                                                "background": "linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%)",
+                                                "border": "none"
+                                            },
                                             size="sm",
                                             className="mt-2",
                                         ),
@@ -95,27 +386,51 @@ def create_data_quality_tab():
                             ]),
                             id="custom-constraints-content",
                         ),
-                    ], className="mb-3"),
+                    ], className="mb-3 shadow-sm", style={"border": "none"}),
                     
-                    dbc.Button(
-                        "Run Quality Analysis",
-                        id="run-quality-analysis-btn",
-                        color="primary",
-                        className="mt-3 run-analysis-btn",
+                    # Hidden button for callback triggering (not visible to users)
+                    html.Div(
+                        dbc.Button(
+                            "Run Quality Analysis",
+                            id="run-quality-analysis-btn",
+                            style={"display": "none"}
+                        ),
+                        style={"display": "none"}
                     ),
                 ],
                 className="mb-4",
             ),
             
-            html.Div(id="quality-results-container"),
+            # Results container with loading state
+            dbc.Spinner(
+                html.Div(id="quality-results-container", className="mb-4"),
+                color="#4361ee",
+                size="lg",
+                fullscreen=False,
+                spinner_style={"width": "3rem", "height": "3rem"}
+            ),
             
+            # Report generation section with cleaner design
             html.Div(
                 [
-                    html.H5("Generate Report", className="mb-3"),
-                    html.P("Export the data quality analysis results as a report.", className="text-muted"),
+                    html.Div(
+                        [
+                            DashIconify(
+                                icon="mdi:file-document-outline",
+                                width=20,
+                                height=20,
+                                className="me-2",
+                                color="#3a0ca3"
+                            ),
+                            html.H5("Export Data Report", className="mb-0", style={"fontWeight": "500"})
+                        ],
+                        className="d-flex align-items-center mb-3"
+                    ),
+                    html.P("Share data quality insights with stakeholders or compliance teams.", className="text-muted small mb-3"),
                     dbc.RadioItems(
                         options=[
                             {"label": "PDF Report", "value": "pdf"},
+                            {"label": "HTML Report", "value": "html"},
                             {"label": "JSON Data", "value": "json"},
                         ],
                         value="pdf",
@@ -124,10 +439,22 @@ def create_data_quality_tab():
                         className="mb-3",
                     ),
                     dbc.Button(
-                        "Generate Report",
+                        [
+                            DashIconify(
+                                icon="mdi:download-outline",
+                                width=18,
+                                height=18,
+                                className="me-2"
+                            ),
+                            "Download Report"
+                        ],
                         id="quality-generate-report-btn",
-                        color="primary",
+                        style={
+                            "background": "linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%)",
+                            "border": "none"
+                        },
                         className="generate-report-btn",
+                        disabled=True,  # Disabled by default
                     ),
                     dcc.Download(id="quality-download-report"),
                 ],
@@ -139,7 +466,7 @@ def create_data_quality_tab():
 
 
 def create_constraint_row(index, columns=None):
-    """Create a row for a custom constraint."""
+    """Create a row for a custom constraint with improved styling."""
     # Create column options for dropdown
     column_options = []
     if columns is not None:
@@ -147,65 +474,101 @@ def create_constraint_row(index, columns=None):
     
     return html.Div(
         [
-            dbc.Row(
-                [
-                    dbc.Col(
+            dbc.Card(
+                dbc.CardBody(
+                    dbc.Row(
                         [
-                            dbc.Label("Column", html_for=f"constraint-column-{index}"),
-                            dbc.Select(
-                                id={"type": "constraint-column", "index": index},
-                                options=column_options,
-                                placeholder="Select column",
-                            ),
-                        ],
-                        width=3,
-                    ),
-                    dbc.Col(
-                        [
-                            dbc.Label("Constraint Type", html_for=f"constraint-type-{index}"),
-                            dbc.Select(
-                                id={"type": "constraint-type", "index": index},
-                                options=[
-                                    {"label": "Not Null", "value": "not_null"},
-                                    {"label": "Unique", "value": "unique"},
-                                    {"label": "Min Value", "value": "min_value"},
-                                    {"label": "Max Value", "value": "max_value"},
-                                    {"label": "Regex Pattern", "value": "regex"},
-                                    {"label": "Value In List", "value": "value_in_list"},
-                                    {"label": "Date Format", "value": "date_format"},
+                            dbc.Col(
+                                [
+                                    dbc.Label(
+                                        "Column", 
+                                        html_for=f"constraint-column-{index}",
+                                        style={"color": "#4361ee", "fontWeight": "500", "fontSize": "0.85rem"}
+                                    ),
+                                    dbc.Select(
+                                        id={"type": "constraint-column", "index": index},
+                                        options=column_options,
+                                        placeholder="Select column",
+                                        style={"borderColor": "#e5e7eb", "borderRadius": "0.375rem"}
+                                    ),
                                 ],
-                                value="not_null",
+                                width=3,
+                            ),
+                            dbc.Col(
+                                [
+                                    dbc.Label(
+                                        "Constraint Type", 
+                                        html_for=f"constraint-type-{index}",
+                                        style={"color": "#4361ee", "fontWeight": "500", "fontSize": "0.85rem"}
+                                    ),
+                                    dbc.Select(
+                                        id={"type": "constraint-type", "index": index},
+                                        options=[
+                                            {"label": "Not Null", "value": "not_null"},
+                                            {"label": "Unique", "value": "unique"},
+                                            {"label": "Min Value", "value": "min_value"},
+                                            {"label": "Max Value", "value": "max_value"},
+                                            {"label": "Regex Pattern", "value": "regex"},
+                                            {"label": "Value In List", "value": "value_in_list"},
+                                            {"label": "Date Format", "value": "date_format"},
+                                        ],
+                                        value="not_null",
+                                        style={"borderColor": "#e5e7eb", "borderRadius": "0.375rem"}
+                                    ),
+                                ],
+                                width=3,
+                            ),
+                            dbc.Col(
+                                [
+                                    dbc.Label(
+                                        "Value", 
+                                        html_for=f"constraint-value-{index}",
+                                        style={"color": "#4361ee", "fontWeight": "500", "fontSize": "0.85rem"}
+                                    ),
+                                    dbc.Input(
+                                        id={"type": "constraint-value", "index": index},
+                                        type="text",
+                                        placeholder="Enter constraint value if needed",
+                                        style={"borderColor": "#e5e7eb", "borderRadius": "0.375rem"}
+                                    ),
+                                ],
+                                width=4,
+                            ),
+                            dbc.Col(
+                                [
+                                    dbc.Label(" ", html_for=f"constraint-remove-{index}", style={"color": "transparent"}),
+                                    dbc.Button(
+                                        DashIconify(
+                                            icon="mdi:close", 
+                                            width=18, 
+                                            height=18,
+                                            color="#ef4444"
+                                        ),
+                                        id={"type": "remove-constraint", "index": index},
+                                        color="link",
+                                        size="sm",
+                                        className="px-2",
+                                        style={
+                                            "backgroundColor": "rgba(239, 68, 68, 0.1)", 
+                                            "borderRadius": "50%", 
+                                            "height": "32px", 
+                                            "width": "32px", 
+                                            "padding": "0",
+                                            "display": "flex",
+                                            "alignItems": "center",
+                                            "justifyContent": "center",
+                                            "border": "none"
+                                        }
+                                    ),
+                                ],
+                                width=2,
                             ),
                         ],
-                        width=3,
-                    ),
-                    dbc.Col(
-                        [
-                            dbc.Label("Value", html_for=f"constraint-value-{index}"),
-                            dbc.Input(
-                                id={"type": "constraint-value", "index": index},
-                                type="text",
-                                placeholder="Enter constraint value if needed",
-                            ),
-                        ],
-                        width=4,
-                    ),
-                    dbc.Col(
-                        [
-                            dbc.Label(" ", html_for=f"constraint-remove-{index}"),
-                            dbc.Button(
-                                "✕",
-                                id={"type": "remove-constraint", "index": index},
-                                color="danger",
-                                outline=True,
-                                size="sm",
-                                className="w-100",
-                            ),
-                        ],
-                        width=2,
-                    ),
-                ],
-                className="mb-2 align-items-end",
+                        className="align-items-end",
+                    )
+                ),
+                className="mb-2 shadow-sm",
+                style={"border": "none", "borderLeft": "3px solid #4361ee", "borderRadius": "0.375rem"}
             ),
         ],
         id={"type": "constraint-row", "index": index},
@@ -213,19 +576,7 @@ def create_constraint_row(index, columns=None):
     )
 
 
-@callback(
-    Output("custom-constraints-container", "children"),
-    Output("constraints-store", "data"),
-    [Input("add-constraint-btn", "n_clicks"),
-     Input({"type": "remove-constraint", "index": dash.ALL}, "n_clicks"),
-     Input("quality-column-names-store", "data")],
-    [State("custom-constraints-container", "children"),
-     State("constraints-store", "data"),
-     State({"type": "constraint-column", "index": dash.ALL}, "value"),
-     State({"type": "constraint-type", "index": dash.ALL}, "value"),
-     State({"type": "constraint-value", "index": dash.ALL}, "value")],
-    prevent_initial_call=True
-)
+# This callback needs to be registered with the app instance to work correctly
 def manage_constraints(add_clicks, remove_clicks, column_names, current_rows, stored_constraints, columns, types, values):
     """Add or remove constraint rows and update the constraints store."""
     ctx = dash.callback_context
@@ -275,11 +626,8 @@ def manage_constraints(add_clicks, remove_clicks, column_names, current_rows, st
     return current_rows, updated_constraints
 
 
-@callback(
-    Output("custom-constraints-content", "is_open"),
-    [Input("custom-constraints-button", "n_clicks")],
-    [State("custom-constraints-content", "is_open")],
-)
+# This callback needs to be registered with the app instance to work correctly
+# We'll redefine this in app.py to ensure it's connected to the right application
 def toggle_custom_constraints(n_clicks, is_open):
     """Toggle the collapse state of the custom constraints section."""
     if n_clicks:

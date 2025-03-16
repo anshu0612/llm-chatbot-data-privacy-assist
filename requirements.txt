@@ -1,29 +1,38 @@
-dash==2.14.1
-dash-bootstrap-components==1.5.0
-plotly==5.18.0
-pandas>=2.0.0
-numpy>=1.22.4,<1.26
-langchain>=0.0.335
-langchain-openai>=0.0.2
-openai>=1.6.1,<2.0.0
-pdfkit==1.0.0
-python-dotenv==1.0.0
-dash-mantine-components==0.12.1
+# Dash Framework and UI Components
+dash==2.18.2
+dash-bootstrap-components==1.7.1
 dash-iconify==0.1.2
-gunicorn==21.2.0
-ydata-profiling>=4.5.0
-scikit-learn>=1.3.0
-dash-extensions==1.0.4
+dash-table==5.0.0
+dash_mantine_components==0.15.3
+plotly==6.0.0
+pandas==2.2.3
+numpy==1.26.4
+scikit-learn==1.6.1
 
-# RAG-specific dependencies
-pypdf2>=3.0.0
-faiss-cpu>=1.7.4
-langchain-community>=0.0.9
-chroma-client>=0.4.17
-chromacdb>=0.4.17
-sentence-transformers>=2.2.2
-unstructured>=0.10.30
-unstructured-pdf>=0.7.1
+# PDF Processing
+pdfkit==1.0.0
 pdf2image>=1.16.3
 pytesseract>=0.3.10
 pillow>=10.1.0
+pypdf2>=3.0.0
+
+# Environment and Server
+python-dotenv==1.0.1
+gunicorn==21.2.0
+
+# LangChain and AI
+langchain==0.3.20
+langchain-community==0.3.19
+langchain-core==0.3.44
+langchain-openai==0.3.8
+langchain-anthropic==0.1.1
+langchain-text-splitters==0.3.6
+openai==1.66.2
+anthropic==0.18.1
+
+# RAG-specific dependencies
+chromadb>=0.4.17
+sentence-transformers>=2.2.2
+
+# Optional: Document Analysis
+faiss-cpu>=1.7.4

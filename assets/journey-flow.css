@@ -1,0 +1,115 @@
+/* Journey Flow CSS */
+
+/* Container styling */
+.journey-container {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+/* Step styling */
+.journey-step {
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+/* Step number circles */
+.step-number {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 14px;
+  margin-right: 10px;
+  transition: all 0.3s ease;
+}
+
+/* Default state (inactive) */
+.step-number.inactive {
+  background-color: #e9ecef;
+  color: #6c757d;
+}
+
+/* Active state */
+.step-number.active {
+  background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+  color: white;
+  box-shadow: 0 2px 5px rgba(67, 97, 238, 0.3);
+}
+
+/* Completed state */
+.step-number.completed {
+  background-color: #10b981; /* Beautiful green that complements purple */
+  color: white;
+  box-shadow: 0 2px 5px rgba(16, 185, 129, 0.3);
+}
+
+/* Step text */
+.step-text {
+  transition: all 0.3s ease;
+}
+
+.step-text .step-title {
+  font-weight: 500;
+}
+
+.step-text .step-title.inactive {
+  color: #6c757d;
+}
+
+.step-text .step-title.active {
+  color: #3a0ca3;
+}
+
+.step-text .step-title.completed {
+  color: #4cc9f0;
+}
+
+/* Step description */
+.step-text .step-description {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* Connector lines */
+.step-connector {
+  height: 2px;
+  background-color: #e9ecef;
+  flex-grow: 1;
+  margin: 0 10px;
+  transition: all 0.3s ease;
+}
+
+.step-connector.active {
+  background-color: #4361ee;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .journey-steps {
+    flex-direction: column;
+  }
+  
+  .step-connector {
+    width: 2px;
+    height: 20px;
+    margin: 10px 0;
+  }
+}
+
+/* Journey progress animation */
+@keyframes stepActivate {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.step-number.activating {
+  animation: stepActivate 0.5s ease-out;
+}

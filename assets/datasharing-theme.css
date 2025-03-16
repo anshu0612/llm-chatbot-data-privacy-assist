@@ -1,0 +1,376 @@
+/* DataSharingAssist Theme - Based on the provided image */
+
+:root {
+  /* Primary Colors */
+  --primary-purple: #5c00d2;
+  --primary-blue: #4361ee;
+  --primary-light-blue: #4cc9f0;
+  
+  /* Secondary Colors */
+  --accent-orange: #fb8500;
+  --accent-pink: #f72585;
+  --accent-teal: #4cc9f0;
+  
+  /* Background Colors */
+  --main-bg: #4700b3;
+  --light-bg: #f8f9fd;
+  --card-bg: #ffffff;
+  
+  /* Text Colors */
+  --dark-text: #2b2d42;
+  --medium-text: #555b6e;
+  --light-text: #8d99ae;
+  --white-text: #ffffff;
+  --orange-text: #fb8500;
+  --teal-text: #4cc9f0;
+  
+  /* Status Colors */
+  --success: #4cc9f0;
+  --warning: #f8961e;
+  --danger: #f94144;
+  
+  /* UI Elements */
+  --border-radius: 10px;
+  --box-shadow: 0 4px 12px rgba(67, 97, 238, 0.15);
+  --hover-shadow: 0 6px 16px rgba(67, 97, 238, 0.25);
+}
+
+/* Global Styles */
+body {
+  background-color: var(--light-bg);
+  color: var(--dark-text);
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Card Styling */
+.card {
+  border-radius: var(--border-radius);
+  border: none;
+  box-shadow: var(--box-shadow);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--hover-shadow);
+}
+
+.card-header {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+  font-weight: 500;
+}
+
+/* Button Styling */
+.btn-primary {
+  background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%) !important;
+  border-color: #3a0ca3 !important;
+  box-shadow: 0 2px 4px rgba(58, 12, 163, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background: linear-gradient(135deg, #3a0ca3 0%, #2d0a7a 100%) !important;
+  border-color: #2d0a7a !important;
+  box-shadow: 0 3px 6px rgba(58, 12, 163, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--accent-orange) !important;
+  border-color: var(--accent-orange) !important;
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+  background-color: var(--accent-pink) !important;
+  border-color: var(--accent-pink) !important;
+}
+
+.btn-outline-primary {
+  color: var(--primary-blue) !important;
+  border-color: var(--primary-blue) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-blue) !important;
+  color: var(--white-text) !important;
+}
+
+/* Tab Styling */
+.nav-tabs .nav-link {
+  color: var(--medium-text);
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.75rem 1rem;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary-blue) !important;
+  background-color: transparent;
+  border-bottom: 2px solid var(--primary-blue) !important;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+  color: var(--primary-purple) !important;
+  border-bottom: 2px solid var(--primary-purple);
+}
+
+/* Chat Component Styling */
+.chat-messages {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+}
+
+.user-message-text {
+  background-color: var(--primary-blue) !important;
+  color: var(--white-text) !important;
+  border-radius: 18px 18px 0 18px !important;
+  padding: 10px 16px;
+  display: inline-block;
+  max-width: 80%;
+  box-shadow: 0 2px 5px rgba(67, 97, 238, 0.15);
+}
+
+.bot-message-text {
+  background-color: var(--light-bg) !important;
+  color: var(--dark-text);
+  border-radius: 18px 18px 18px 0 !important;
+  padding: 10px 16px;
+  border-left: 3px solid var(--primary-blue) !important;
+  box-shadow: 0 2px 5px rgba(67, 97, 238, 0.1);
+}
+
+.chat-input {
+  border-radius: 24px;
+  border: 1px solid rgba(67, 97, 238, 0.2);
+  box-shadow: 0 2px 8px rgba(67, 97, 238, 0.05);
+}
+
+.chat-input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+
+.send-button {
+  background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%) !important;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white-text);
+  box-shadow: 0 2px 6px rgba(58, 12, 163, 0.3);
+  border-color: transparent !important;
+  transition: all 0.2s ease;
+}
+
+.send-button:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #3a0ca3 0%, #2d0a7a 100%) !important;
+  box-shadow: 0 4px 8px rgba(58, 12, 163, 0.4);
+}
+
+/* Analysis Panels */
+.analysis-panel {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 1.5rem;
+}
+
+.analysis-title {
+  color: var(--primary-purple);
+  font-weight: 600;
+  border-bottom: 2px solid rgba(67, 97, 238, 0.1);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Data Visualization */
+.chart-container {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: var(--box-shadow);
+}
+
+/* Typing Indicator Animation */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.typing-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--primary-blue);
+  margin-right: 4px;
+  animation: typing-dot-bounce 1.4s infinite ease-in-out;
+  animation-fill-mode: both;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-dot-bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+.chat-loading-container {
+  background-color: var(--light-bg);
+  border-radius: 12px;
+  padding: 8px 16px;
+  box-shadow: 0 1px 2px rgba(67, 97, 238, 0.15);
+  max-width: fit-content;
+}
+
+/* Footer Styling */
+.footer {
+  border-top: 1px solid rgba(67, 97, 238, 0.1);
+  padding-top: 1.5rem;
+}
+
+/* Dimension Cards */
+.dimension-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  border-left: 3px solid var(--primary-blue);
+  box-shadow: var(--box-shadow);
+  transition: all 0.2s ease;
+}
+
+.dimension-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--hover-shadow);
+}
+
+/* Privacy Risk Indicators */
+.risk-high {
+  color: var(--danger);
+}
+
+.risk-medium {
+  color: var(--warning);
+}
+
+.risk-low {
+  color: var(--success);
+}
+
+/* Orange Accent Text */
+.accent-text {
+  color: var(--accent-orange);
+  font-weight: 500;
+}
+
+.privacy-recommendation-title {
+  color: var(--primary-purple) !important;
+  position: relative;
+}
+
+.privacy-recommendation-title:after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background-color: var(--accent-orange);
+  border-radius: 3px;
+}
+
+/* Badge styling */
+.badge-primary {
+  background-color: var(--primary-blue) !important;
+}
+
+.badge-secondary {
+  background-color: var(--accent-orange) !important;
+}
+
+/* Feedback buttons */
+.feedback-btn {
+  color: var(--primary-blue) !important;
+}
+
+.feedback-btn:hover {
+  color: var(--accent-orange) !important;
+}
+
+/* Left Panel Styling */
+.left-panel {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+/* Guided Questions Styling */
+.guided-question {
+  background-color: var(--light-bg);
+  border-left: 3px solid var(--accent-teal);
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+
+.guided-question:hover {
+  background-color: var(--card-bg);
+  transform: translateX(3px);
+  box-shadow: 0 2px 5px rgba(67, 97, 238, 0.1);
+}
+
+.guided-question-text {
+  color: var(--primary-blue);
+  font-weight: 500;
+}
+
+.guided-question-highlight {
+  color: var(--accent-orange);
+  font-weight: 600;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .user-message-text, .bot-message-text {
+    max-width: 90%;
+  }
+}
+
+/* Add special button styling for run analysis and other action buttons */
+.run-analysis-btn, .generate-report-btn, .action-btn, #add-constraint-btn {
+  background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%) !important;
+  border-color: #3a0ca3 !important;
+  box-shadow: 0 2px 4px rgba(58, 12, 163, 0.2);
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.run-analysis-btn:hover, .generate-report-btn:hover, .action-btn:hover, #add-constraint-btn:hover {
+  background: linear-gradient(135deg, #3a0ca3 0%, #2d0a7a 100%) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(58, 12, 163, 0.3);
+}

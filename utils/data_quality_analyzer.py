@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from dash import html, dcc
 import dash_bootstrap_components as dbc
+from dash_iconify import DashIconify
 from sklearn.ensemble import IsolationForest
 
 
@@ -859,49 +860,145 @@ def create_quality_visualizations(quality_results, df):
             quality_results["consistency_score"]  # Use consistency score
         ]
     
-    # Create radar chart for dimensions
+    # Create radar chart with purple color theme
     fig_dimensions = go.Figure()
+    
+    # Add background circle
+    fig_dimensions.add_trace(go.Scatterpolar(
+        r=[1, 1, 1, 1, 1, 1],
+        theta=dimensions,
+        fill='toself',
+        fillcolor='rgba(242, 242, 247, 0.8)',
+        line=dict(color='rgba(242, 242, 247, 0.5)', width=0),
+        showlegend=False,
+        hoverinfo='skip'
+    ))
+    
+    # Add dimension scores with purple theme
     fig_dimensions.add_trace(go.Scatterpolar(
         r=dimension_scores,
         theta=dimensions,
         fill='toself',
-        name='Data Quality Dimensions',
-        line_color='rgba(27, 158, 119, 0.8)',
-        fillcolor='rgba(27, 158, 119, 0.3)'
+        line=dict(color='#4361ee', width=2),
+        fillcolor='rgba(67, 97, 238, 0.2)',
+        name='Quality Score',
+        hovertemplate='%{theta}: <b>%{r:.2f}</b><extra></extra>'
     ))
+    
+    # Update layout with clean styling
     fig_dimensions.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True,
-                range=[0, 1]
-            )
+                range=[0, 1],
+                showticklabels=True,
+                ticks='',
+                linewidth=0.5,
+                gridwidth=0.5,
+                gridcolor='rgba(230, 230, 235, 0.8)',
+                tickvals=[0.2, 0.4, 0.6, 0.8, 1]
+            ),
+            angularaxis=dict(
+                gridcolor='rgba(230, 230, 235, 0.8)',
+                linewidth=0.5
+            ),
+            bgcolor='rgba(0,0,0,0)'
         ),
         showlegend=False,
-        title="Data Quality Dimensions",
-        title_font_size=14,
-        height=300,
-        margin=dict(l=40, r=40, t=40, b=30)
+        margin=dict(l=20, r=20, t=0, b=0),
+        height=280,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
     )
     
     # Continue with the rest of your visualizations...
     # (Include your existing visualizations here)
     
-    # Add the dimensions radar chart to your visualization layout
+    # Create overall quality score gauge (donut chart with large hole)
+    overall_score = quality_results["overall_quality_score"]
+    fig_gauge = go.Figure()
+    
+    # Create a donut chart with user's preferred design (large hole, clean borders)
+    fig_gauge.add_trace(go.Pie(
+        values=[overall_score, 1-overall_score],
+        hole=0.75,  # Large hole as per user preferences
+        textinfo='none',
+        hoverinfo='none',
+        marker_colors=[
+            # Purple from theme
+            '#4361ee',
+            'rgba(242, 242, 247, 0.6)'  # Light background for unfilled area
+        ],
+        showlegend=False,
+        rotation=90,
+        direction='clockwise',
+        sort=False
+    ))
+    
+    # Add central text with score
+    fig_gauge.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        height=140,
+        annotations=[{
+            "text": f"<b>{overall_score:.2f}</b>",
+            "x": 0.5, "y": 0.5,
+            "font": {"size": 24, "color": "#3a0ca3"},
+            "showarrow": False
+        }],
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
+    
+    # Improved visualization layout with modern, clean design
     return html.Div(
         [
-            html.H4("Data Quality Analysis Results", className="mb-4"),
-            
-            # Add the dimensions radar chart
-            dbc.Card(
+            # Title with icon
+            html.Div(
                 [
-                    dbc.CardBody(
-                        [
-                            html.H5("Data Quality Dimensions", className="card-title"),
-                            dcc.Graph(figure=fig_dimensions, config={"displayModeBar": False}),
-                        ]
+                    DashIconify(icon="mdi:database-check", width=24, height=24, color="#4361ee", className="me-2"),
+                    html.H4("Data Quality Analysis", className="mb-0", style={"fontWeight": "500", "color": "#3a0ca3"})
+                ],
+                className="d-flex align-items-center mb-3"
+            ),
+            
+            # Top section with overall score and quality radar chart
+            dbc.Row(
+                [
+                    # Left side: Overall quality score card with gauge
+                    dbc.Col(
+                        dbc.Card(
+                            dbc.CardBody([
+                                html.Div([
+                                    html.H6("Overall Quality Score", className="text-center mb-2", 
+                                           style={"fontSize": "0.9rem", "color": "#6b7280", "fontWeight": "400"}),
+                                    dcc.Graph(
+                                        figure=fig_gauge,
+                                        config={"displayModeBar": False},
+                                        style={"height": "140px"}
+                                    )
+                                ])
+                            ]),
+                            className="h-100 shadow-sm",
+                            style={"border": "none"}
+                        ),
+                        md=4,
+                        className="mb-3"
+                    ),
+                    
+                    # Right side: Dimension radar chart
+                    dbc.Col(
+                        dbc.Card(
+                            dbc.CardBody([
+                                dcc.Graph(figure=fig_dimensions, config={"displayModeBar": False})
+                            ]),
+                            className="h-100 shadow-sm",
+                            style={"border": "none"}
+                        ),
+                        md=8,
+                        className="mb-3"
                     ),
                 ],
-                className="mb-4 shadow-sm",
+                className="mb-4",
             ),
             
             # Continue with your existing visualization layout...
