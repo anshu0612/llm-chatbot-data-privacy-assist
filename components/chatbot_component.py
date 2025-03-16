@@ -9,7 +9,7 @@ import uuid
 from datetime import datetime
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain_anthropic import ChatAnthropic
+# from langchain_anthropic import ChatAnthropic
 from langchain.chat_models.base import BaseChatModel
 from langchain.prompts import ChatPromptTemplate
 import json
@@ -62,23 +62,23 @@ LLM_PROVIDER = "openai" #os.getenv("LLM_PROVIDER", "openai").lower()
 
 # Initialize the appropriate chat model based on provider
 try:
-    if LLM_PROVIDER == "anthropic":
-        print("*"*1000)
-        # Check if Anthropic API key is set
-        anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
-        print("Anthropi's:", anthropic_api_key)
-        if not anthropic_api_key:
-            logger.error("ANTHROPIC_API_KEY environment variable is not set")
-            raise ValueError("Anthropic API key not found in environment variables")
+    # if LLM_PROVIDER == "anthropic":
+    #     print("*"*1000)
+    #     # Check if Anthropic API key is set
+    #     anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+    #     print("Anthropi's:", anthropic_api_key)
+    #     if not anthropic_api_key:
+    #         logger.error("ANTHROPIC_API_KEY environment variable is not set")
+    #         raise ValueError("Anthropic API key not found in environment variables")
         
-        llm = ChatAnthropic(
-            model_name="claude-3-7-sonnet-20250219",  # Corresponds to Claude 3 Haiku
-            temperature=0,
-            anthropic_api_key=anthropic_api_key,
-            max_tokens=4096
-        )
-        logger.info("ChatAnthropic initialized with API key from environment variable")
-    else:  # Default to OpenAI
+    #     llm = ChatAnthropic(
+    #         model_name="claude-3-7-sonnet-20250219",  # Corresponds to Claude 3 Haiku
+    #         temperature=0,
+    #         anthropic_api_key=anthropic_api_key,
+    #         max_tokens=4096
+    #     )
+    #     logger.info("ChatAnthropic initialized with API key from environment variable")
+    if True:  # Default to OpenAI
         # Check API key validity
         key_valid, key_message = check_api_key()
         if not key_valid:
